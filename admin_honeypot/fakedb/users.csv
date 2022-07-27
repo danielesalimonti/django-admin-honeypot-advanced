@@ -1,0 +1,8 @@
+ID;username;password;salt
+1;marcus;$argon2i$v=19$m=65536,t=5,p=8$b3p1bUtkbWxvTzFEOVpqNQ$7qeeHz8PaCDtdRGzEuxt1YOeg7IzRAK4FMUgUxuSXiM;ozumKdmloO1D9Zj5
+2;maria;$argon2i$v=19$m=65536,t=5,p=8$ZGx1dFNDUUJLNlZDeDRxag$24gZfgY1M/ryNtDU//QQnEzWJ1suGJxVb9959YLT1UE;dlutSCQBK6VCx4qj
+3;orazio;$argon2i$v=19$m=65536,t=5,p=8$SWFudFNKRVRBTXlqM3hncg$yRUnUoE7l6ifhZL225xTJPkm5st/I0+uhG+TmJ6c8B8;IantSJETAMyj3xgr
+4;george;$argon2i$v=19$m=65536,t=5,p=8$YmtTRzNhZUljUUVneURzbQ$t4p6WF9bQ6CNO4HzoY361vDXWiEEvl7MNWkQxLwi85k;bkSG3aeIcQEgyDsm
+5;dylan;$argon2i$v=19$m=65536,t=5,p=8$amxxWHV4clFYeFljb1hOMw$2IPBxyzMXTDUBF4fk/QKpZHPGiKlxi8vNY6C2JSdAao;jlqXuxrQXxYcoXN3
+6;sanna;$argon2i$v=19$m=65536,t=5,p=8$cnRtWFZ2d2VzeDNoTW1RSw$/jCS/ObVtugflIjqUcnAzv4AmlSIVxTOxQ/mvP0+Y+o;rtmXVvwesx3hMmQK
+7;dev;$argon2i$v=19$m=65536,t=5,p=8$WXdmWThaa25sUWdYMlJZdg$xHH2Y6qZ22BGFR78p/SmnVHCzGXLPFrqDthsQfNVac4;YwfY8ZknlQgX2RYv

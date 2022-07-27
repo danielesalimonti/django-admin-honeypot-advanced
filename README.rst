@@ -1,5 +1,5 @@
 =====================
-django-admin-honeypot
+django-admin-honeypot-advanced
 =====================
 
 .. image:: https://travis-ci.org/dmpayton/django-admin-honeypot.svg?branch=develop

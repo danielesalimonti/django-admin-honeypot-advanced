@@ -1,5 +1,7 @@
 django
 django-ipware
+csvkit
+fs
 
 pytest
 pytest-cov

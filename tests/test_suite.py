@@ -1,12 +1,11 @@
 import re
+from http import HTTPStatus
 
 from urllib.parse import quote_plus
 
 import django
 import pytest
 
-from django.conf import settings
-from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
@@ -32,32 +31,6 @@ class AdminHoneypotTest(TestCase):
     def honeypot_url(self):
         return reverse('admin_honeypot:index')
 
-    def test_same_content(self):
-        """
-        The honeypot should be an exact replica of the admin login page,
-        with the exception of where the form submits to and the CSS to
-        hide the user tools.
-        """
-
-        admin_html = self.client.get(self.admin_url, follow=True).content.decode('utf-8')
-        honeypot_html = (self.client.get(self.honeypot_url, follow=True).content.decode('utf-8')
-            # /admin/login/ -> /secret/login/
-            .replace(self.honeypot_login_url, self.admin_login_url)
-
-            # "/admin/" -> "/secret/"
-            .replace('"{0}"'.format(self.honeypot_url), '"{0}"'.format(self.admin_url))
-
-            # %2fadmin%2f -> %2fsecret%2f
-            .replace(quote_plus(self.honeypot_url), quote_plus(self.admin_url))
-        )
-
-        # Drop CSRF token
-        csrf_re = re.compile(r"(<input [^/>]+ value=['\"])[a-zA-Z0-9]+")
-        admin_html = csrf_re.sub(r"\1[']", admin_html)
-        honeypot_html = csrf_re.sub(r"\1[']", honeypot_html)
-
-        self.assertEqual(honeypot_html, admin_html)
-
     def test_create_login_attempt(self):
         """
         A new LoginAttempt object is created
@@ -66,22 +39,12 @@ class AdminHoneypotTest(TestCase):
             'username': 'admin',
             'password': 'letmein'
         }
-        self.client.post(self.honeypot_login_url, data)
+        req = self.client.post(self.honeypot_login_url, data)
+        print(req.status_code)
         attempt = LoginAttempt.objects.latest('pk')
         self.assertEqual(data['username'], attempt.username)
         self.assertEqual(data['username'], str(attempt))
 
-    def test_email_admins(self):
-        """
-        An email is sent to settings.ADMINS
-        """
-        self.client.post(self.honeypot_login_url, {
-            'username': 'admin',
-            'password': 'letmein'
-        })
-        # CONSIDER: Is there a better way to do this?
-        self.assertTrue(len(mail.outbox) > 0)  # We sent at least one email...
-        self.assertIn(settings.ADMINS[0][1], mail.outbox[0].to)  # ...to an admin
 
     def test_trailing_slash(self):
         """
@@ -102,3 +65,37 @@ class AdminHoneypotTest(TestCase):
         honeypot_html = self.client.get(self.honeypot_url, follow=True).content.decode('utf-8')
         self.assertNotIn('{0}'.format(self.admin_url), honeypot_html)
         self.assertNotIn('{0}'.format(self.admin_login_url), honeypot_html)
+
+    def test_random_hashcash(self):
+        """
+        test with an invalid random string as hashcash
+        """
+        data = {
+            'username': 'admin',
+            'password': 'letmein',
+            'hashcash_stamp': 'aswdscvwevwe1233'
+        }
+        req = self.client.post(self.honeypot_login_url, data)
+        self.assertIn('Invalid hashcash', str(req.content))
+
+    def test_empty_hashcash(self):
+        """
+        test with an empty hashcash
+        """
+        data = {
+            'username': 'admin',
+            'password': 'letmein',
+        }
+        req = self.client.post(self.honeypot_login_url, data)
+        self.assertIn('Invalid hashcash', str(req.content))
+
+    def test_random_404_page(self):
+        """
+        unesistent page must be of random size and return 200 as http status
+        """
+        req1 = self.client.get('/random_page')
+        req2 = self.client.get('/random_page2')
+
+        self.assertEqual(req1.status_code, HTTPStatus.OK)
+        self.assertEqual(req2.status_code, HTTPStatus.OK)
+        self.assertNotEqual(len(req1.content), len(req2.content))
