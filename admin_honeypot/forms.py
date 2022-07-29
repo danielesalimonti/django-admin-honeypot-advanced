@@ -2,7 +2,6 @@ import hashlib
 import os
 from math import floor
 
-import django
 from django import forms
 from django.contrib.admin.forms import AdminAuthenticationForm
 from time import strftime, time, gmtime

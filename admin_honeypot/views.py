@@ -1,7 +1,5 @@
 import os
-from importlib.metadata import files
 
-import django
 import fs.errors
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string

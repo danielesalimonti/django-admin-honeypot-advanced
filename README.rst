@@ -1,6 +1,6 @@
-=====================
+==============================
 django-admin-honeypot-advanced
-=====================
+==============================
 
 
 
@@ -16,7 +16,7 @@ The honeypot is a fork of Derek Payton's django-admin-honeypot
 
 **Author**: Daniele Salimonti
 
-**Version**: 1.1.0
+**Version**: 1.0.0
 
 **License**: MIT
 
