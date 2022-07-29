@@ -42,7 +42,6 @@ class AdminHoneypot(generic.FormView):
         return super(AdminHoneypot, self).dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=form_class):
-        print("get form 1")
         return form_class(self.request, **self.get_form_kwargs())
 
     def get_context_data(self, **kwargs):
@@ -72,7 +71,6 @@ class AdminHoneypot(generic.FormView):
         )
 
         honeypot.send(sender=LoginAttempt, instance=instance, request=self.request)
-
         preferences = Preferences.objects.all().first()
         if preferences is not None and preferences.has_fail2ban_log:
             log = open("honeypot.log")
@@ -86,32 +84,26 @@ class AdminHoneypotSQLi(generic.FormView):
     template_name = 'admin_honeypot/login2.html'
     form_class = HoneypotLoginFormSQLi
 
-
     def dispatch(self, request, *args, **kwargs):
         if not request.path.endswith('/'):
             return redirect(request.path + '/', permanent=True)
-
         # Django redirects the user to an explicit login view with
         # a next parameter, so emulate that.
         # login_url = reverse('admin_honeypot:login_sqli')
         # if request.path != login_url:
         #     return redirect_to_login(request.get_full_path(), login_url)
-
         users_csv = open(str(os.path.join(os.path.dirname(__file__) + '/fakedb/users.csv')), 'w')
         users_csv.write('ID;username;password;salt\n')
         for user in FakeUser.objects.all():
             users_csv.write(user.print_for_csv() + '\n')
-        print("STAMPA CSV")
         users_csv.close()
 
         return super(AdminHoneypotSQLi, self).dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=form_class):
-        print("get form sqli")
         return form_class(self.request, **self.get_form_kwargs())
 
     def get_context_data(self, **kwargs):
-
         context = super(AdminHoneypotSQLi, self).get_context_data(**kwargs)
         context.update({
             **AdminSite().each_context(self.request),
@@ -147,7 +139,6 @@ class AdminHoneypotSQLi(generic.FormView):
 
 
 class PathTraversal(generic.detail.BaseDetailView):
-
 
     def dispatch(self, request, *args, **kwargs):
         if not request.path.endswith('/'):
@@ -204,14 +195,15 @@ def hashcash_metadata(request):
 def handler404(request, exception=None, template_name='admin_honeypot/404.html'):
     alphabet = ascii_letters + "+/="
     length = random.randint(1000, 1000000)
+    random_space = random.randint(1, 200)
     variable = ''.join([random.choice(alphabet) for _ in [None] * length])
     title = ''.join([random.choice(alphabet) for _ in [None] * 7])
     hint = b64encode(reverse('admin_honeypot:login').encode('ascii'))
     response = HttpResponse(render_to_string(template_name,
                                              {'variable': variable,
                                               'hint': hint.decode('ascii'),
-                                              'title': title}))
+                                              'title': title,
+                                              'random_space': ' '*random_space}))
     response.status_code = 200
 
-    print(reverse('admin_honeypot:login'))
     return response

@@ -15,8 +15,7 @@
                $('#content-main').append(
                 "<p id='loading_wrap' style='text-align: center'>" +
                 "Generating hashcash, please wait." +
-                "</p>")
-               // $('#loading_wrap').modal();
+                "</p>");
                $.ajax('{% url 'admin_honeypot:index' %}hashcash_metadata/', {
                   dataType: 'json',
                   timeout: 1000,
@@ -32,26 +31,19 @@
                       let zeros = '0'.repeat(zero_hex_digits);
                       let non_zero_binary_to_hex = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111'];
                       let non_zero_to_find = [];
-                      console.log(bits);
                       if (bits%4 !== 0) {
-                          console.log("qui");
                           non_zero_binary_to_hex.forEach((e, i) => {
-                              console.log(e + " " +i);
                              if ('0'.repeat(bits%4) === e.slice(0, bits%4)) {
                                  non_zero_to_find.push(i.toString());
                              }
                           });
                       }
-                      console.log(non_zero_to_find)
 
                       let hashcash_stamp = '';
-                      //alert("qui")
 
                       while (true) {
                           let hash = CryptoJS.SHA1(challenge + counter.toString(16));
-                          //alert(challenge + counter.toString(16))
                           let digest = CryptoJS.enc.Hex.stringify(hash);
-                          //alert(digest);
                           if (digest.slice(0, zero_hex_digits) === zeros) {
                               if (bits%4 === 0) {
                                   hashcash_stamp = challenge + counter.toString(16);
@@ -59,7 +51,6 @@
                               } else {
                                   if (non_zero_to_find.includes(digest.charAt(bits%4))) {
                                       hashcash_stamp = challenge + counter.toString(16);
-                                      alert(digest);
                                       break;
                                   }
                               }
@@ -67,12 +58,11 @@
                           counter++;
                       }
                       console.log(hashcash_stamp);
-                      alert(hashcash_stamp);
                       $('#hashcash_stamp_id').val(hashcash_stamp);
                       e.currentTarget.submit();
                       $('#loading_wrap').remove();
                   },
-                  error: () => alert('ERROR')
+                  error: () => location.reload()
                });
            });
         });

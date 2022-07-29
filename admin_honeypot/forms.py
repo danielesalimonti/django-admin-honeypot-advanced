@@ -5,7 +5,7 @@ from math import floor
 import django
 from django import forms
 from django.contrib.admin.forms import AdminAuthenticationForm
-from time import strftime, localtime, time, gmtime
+from time import strftime, time, gmtime
 
 from django.core.exceptions import ObjectDoesNotExist
 from ipware import get_client_ip
@@ -103,25 +103,20 @@ class HoneypotLoginFormSQLi(AdminAuthenticationForm):
             result = CSVSQL(query)
             result.main()
         s = out.getvalue().splitlines()
-        print(s)
 
         if self.check_hashcash_stamp():
-            print("OK HASHCASH")
             if len(s) >= 2:
-                print(s[1])
                 raise forms.ValidationError(
                     self.error_messages['incorrect_password'],
                     code='incorrect_password',
                 )
             else:
-                print("NO ANSWER")
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
                     code='invalid_login',
                     params={'username': self.username_field.verbose_name}
                 )
         else:
-            print("INVALID HASHCASH")
             raise forms.ValidationError(
                 self.error_messages['invalid_hashcash'],
                 code='invalid_hashcash',
