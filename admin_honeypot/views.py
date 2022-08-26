@@ -85,11 +85,7 @@ class AdminHoneypotSQLi(generic.FormView):
     def dispatch(self, request, *args, **kwargs):
         if not request.path.endswith('/'):
             return redirect(request.path + '/', permanent=True)
-        # Django redirects the user to an explicit login view with
-        # a next parameter, so emulate that.
-        # login_url = reverse('admin_honeypot:login_sqli')
-        # if request.path != login_url:
-        #     return redirect_to_login(request.get_full_path(), login_url)
+
         users_csv = open(str(os.path.join(os.path.dirname(__file__) + '/fakedb/users.csv')), 'w')
         users_csv.write('ID;username;password;salt\n')
         for user in FakeUser.objects.all():
@@ -142,15 +138,9 @@ class PathTraversal(generic.detail.BaseDetailView):
         if not request.path.endswith('/'):
             return redirect(request.path + '/', permanent=True)
 
-        # Django redirects the user to an explicit login view with
-        # a next parameter, so emulate that.
-        # login_url = reverse('admin_honeypot:login_sqli')
-        # if request.path != login_url:
-        #     return redirect_to_login(request.get_full_path(), login_url)
-
         return super(PathTraversal, self).dispatch(request, *args, **kwargs)
 
-    def generate_in_memory_fs(self):
+    def generate_fs_and_get_file(self):
 
         file_to_get = self.request.GET.get('file')
         filesys = OSFS(os.path.join(os.path.dirname(__file__)) + '/fake_fs')
@@ -161,11 +151,10 @@ class PathTraversal(generic.detail.BaseDetailView):
             return error
         finally:
             filesys.tree()
-            # print(filesys)
             filesys.close()
 
     def get(self, request, *args, **kwargs):
-        file = self.generate_in_memory_fs()
+        file = self.generate_fs_and_get_file()
         return HttpResponse(file, content_type='text/plain; charset=utf8')
 
 

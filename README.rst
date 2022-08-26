@@ -16,7 +16,7 @@ The honeypot is a fork of Derek Payton's django-admin-honeypot
 
 **Author**: Daniele Salimonti
 
-**Version**: 1.0.0
+**Version**: 1.0.1
 
 **License**: MIT
 

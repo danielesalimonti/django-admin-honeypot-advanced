@@ -6,66 +6,66 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/crypto-js@3.1.9-1/crypto-js.js"></script>
     <script>
-        $(document).ready(() => {
-            $('#login-form').append(
-                '<input type="hidden" name="hashcash_stamp" value="#" id="hashcash_stamp_id">'
-            )
-           $('#login-form').submit((e) => {
-               e.preventDefault();
-               $('#content-main').append(
-                "<p id='loading_wrap' style='text-align: center'>" +
-                "Generating hashcash, please wait." +
-                "</p>");
-               $.ajax('{% url 'admin_honeypot:index' %}hashcash_metadata/', {
-                  dataType: 'json',
-                  timeout: 1000,
-                  success: (data) => {
-                      const bits = parseInt(data.bits);
-                      const salt = data.salt;
-                      const username = $('#id_username').val();
-                      const password = $('#id_password').val();
-                      const timestamp = new Date().toISOString().slice(2,19).replace(/[-:T]/g,"");
-                      let challenge = `1:${bits}:${timestamp}:${username}@${password}::${salt}:`;
-                      let counter = 0;
-                      let zero_hex_digits = Math.floor(bits/4);
-                      let zeros = '0'.repeat(zero_hex_digits);
-                      let non_zero_binary_to_hex = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111'];
-                      let non_zero_to_find = [];
-                      if (bits%4 !== 0) {
-                          non_zero_binary_to_hex.forEach((e, i) => {
-                             if ('0'.repeat(bits%4) === e.slice(0, bits%4)) {
-                                 non_zero_to_find.push(i.toString());
-                             }
-                          });
-                      }
+$(document).ready(() => {
+    $('#login-form').append(
+        '<input type="hidden" name="hashcash_stamp" value="#" id="hashcash_stamp_id">'
+    )
+   $('#login-form').submit((e) => {
+       e.preventDefault();
+       $('#content-main').append(
+        "<p id='loading_wrap' style='text-align: center'>" +
+        "Generating hashcash, please wait." +
+        "</p>");
+       $.ajax('{% url 'admin_honeypot:index' %}hashcash_metadata/', {
+          dataType: 'json',
+          timeout: 1000,
+          success: (data) => {
+              const bits = parseInt(data.bits);
+              const salt = data.salt;
+              const username = $('#id_username').val();
+              const password = $('#id_password').val();
+              const timestamp = new Date().toISOString().slice(2,19).replace(/[-:T]/g,"");
+              let challenge = `1:${bits}:${timestamp}:${username}@${password}::${salt}:`;
+              let counter = 0;
+              let zero_hex_digits = Math.floor(bits/4);
+              let zeros = '0'.repeat(zero_hex_digits);
+              let non_zero_binary_to_hex = ['0000', '0001', '0010', '0011', '0100', '0101', '0110', '0111'];
+              let non_zero_to_find = [];
+              if (bits%4 !== 0) {
+                  non_zero_binary_to_hex.forEach((e, i) => {
+                     if ('0'.repeat(bits%4) === e.slice(0, bits%4)) {
+                         non_zero_to_find.push(i.toString());
+                     }
+                  });
+              }
 
-                      let hashcash_stamp = '';
+              let hashcash_stamp = '';
 
-                      while (true) {
-                          let hash = CryptoJS.SHA1(challenge + counter.toString(16));
-                          let digest = CryptoJS.enc.Hex.stringify(hash);
-                          if (digest.slice(0, zero_hex_digits) === zeros) {
-                              if (bits%4 === 0) {
-                                  hashcash_stamp = challenge + counter.toString(16);
-                                  break;
-                              } else {
-                                  if (non_zero_to_find.includes(digest.charAt(bits%4))) {
-                                      hashcash_stamp = challenge + counter.toString(16);
-                                      break;
-                                  }
-                              }
+              while (true) {
+                  let hash = CryptoJS.SHA1(challenge + counter.toString(16));
+                  let digest = CryptoJS.enc.Hex.stringify(hash);
+                  if (digest.slice(0, zero_hex_digits) === zeros) {
+                      if (bits%4 === 0) {
+                          hashcash_stamp = challenge + counter.toString(16);
+                          break;
+                      } else {
+                          if (non_zero_to_find.includes(digest.charAt(bits%4))) {
+                              hashcash_stamp = challenge + counter.toString(16);
+                              break;
                           }
-                          counter++;
                       }
-                      console.log(hashcash_stamp);
-                      $('#hashcash_stamp_id').val(hashcash_stamp);
-                      e.currentTarget.submit();
-                      $('#loading_wrap').remove();
-                  },
-                  error: () => location.reload()
-               });
-           });
-        });
+                  }
+                  counter++;
+              }
+              console.log(hashcash_stamp);
+              $('#hashcash_stamp_id').val(hashcash_stamp);
+              e.currentTarget.submit();
+              $('#loading_wrap').remove();
+          },
+          error: () => location.reload()
+       });
+   });
+});
     </script>
 {% endblock %}
 

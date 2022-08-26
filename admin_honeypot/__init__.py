@@ -1,5 +1,5 @@
 __author__ = 'Daniele Salimonti <danielesalim@outlook.it>'
 __copyright__ = 'Copyright (c) Daniele Salimonti'
 __description__ = 'An advanced honeypot for Django'
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __license__ = 'MIT License'

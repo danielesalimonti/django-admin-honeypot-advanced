@@ -33,7 +33,6 @@ setup(
     maintainer='Daniele Salimonti',
     maintainer_email='danielesalim@outlook.it',
     url='https://github.com/danielesalimonti/django-admin-honeypot-advanced',
-    #download_url='https://github.com/dmpayton/django-admin-honeypot/tarball/v%s' % __version__,
     license=__license__,
     include_package_data=True,
     packages=find_packages(),

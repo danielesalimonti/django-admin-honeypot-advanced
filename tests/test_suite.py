@@ -200,9 +200,7 @@ class AdminHoneypotTest(TestCase):
         self.assertIn('Invalid hashcash', req.content.decode('utf-8'))
 
     def test_random_404_page(self):
-        """
-        unesistent page must be of random size and return 200 as http status
-        """
+
         req1 = self.client.get('/random_page')
         req2 = self.client.get('/random_page2')
 
@@ -269,7 +267,7 @@ class AdminHoneypotTest(TestCase):
 
     def test_path_traversal(self):
 
-        req_etc_passwd = self.client.get(self.honeypot_path_traversal_url + '?file=etc/passwd')
+        req_etc_passwd = self.client.get(self.honeypot_path_traversal_url + '?file=/etc/passwd')
         path = os.path.dirname(__file__).replace('tests', 'admin_honeypot') + '/fake_fs/etc/passwd'
         etc_passwd = open(path)
         data = etc_passwd.read()
@@ -277,7 +275,7 @@ class AdminHoneypotTest(TestCase):
         content = req_etc_passwd.content.decode('utf-8').replace('\r\n', '\n')
         self.assertEqual(content, data)
 
-    def test_path_traversal_unesistent_fine(self):
+    def test_path_traversal_nonexistent_file(self):
 
         req_etc_passwd = self.client.get(self.honeypot_path_traversal_url + '?file=random_file')
         self.assertIn('not found', req_etc_passwd.content.decode('utf-8'))

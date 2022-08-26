@@ -23,20 +23,14 @@ class HoneypotLoginForm(AdminAuthenticationForm):
         self.error_messages["invalid_hashcash"] = _("Invalid hashcash.")
 
     def clean(self):
-        """
-        Always raise the default error message, because we don't
-        care what they entered here.
-        """
-        print("clean")
+
         if self.check_hashcash_stamp():
-            print("OK HASHCASH")
             raise forms.ValidationError(
                 self.error_messages['invalid_login'],
                 code='invalid_login',
                 params={'username': self.username_field.verbose_name}
             )
         else:
-            print("INVALID HASHCASH")
             raise forms.ValidationError(
                 self.error_messages['invalid_hashcash'],
                 code='invalid_hashcash',
@@ -56,7 +50,6 @@ class HoneypotLoginForm(AdminAuthenticationForm):
         try:
             claim, date, res, ext, rand, counter = hashcash_stamp[2:].split(':')
         except ValueError:
-            # ERR.write("Malformed version 1 hashcash stamp!\n")
             return False
         try:
             hashcash_metadata = HashcashMetadata.objects.get(ip_address=ip_address, salt=rand, is_used=False)
